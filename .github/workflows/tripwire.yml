@@ -37,12 +37,25 @@ jobs:
 
       # Run under dash where available. bash is forgiving about constructs that
       # dash rejects, so passing under bash alone would not prove portability.
+      # Results also go to the job summary, which is readable without signing in.
+      # A test suite whose failures are only visible to the maintainer is not much
+      # of a public trust signal.
       - name: Run tripwire tests
         run: |
-          if command -v dash >/dev/null 2>&1; then
-            echo "--- dash ---"; dash tests/tripwire/run.sh
-          fi
-          echo "--- sh ---"; sh tests/tripwire/run.sh
+          status=0
+          {
+            echo '## `${{ matrix.os }}`'
+            echo
+            if command -v dash >/dev/null 2>&1; then
+              echo '### dash'; echo '```'
+              dash tests/tripwire/run.sh 2>&1 || status=1
+              echo '```'
+            fi
+            echo '### sh'; echo '```'
+            sh tests/tripwire/run.sh 2>&1 || status=1
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          exit $status
 
       - name: Reject GNU-only regex escapes
         run: |
