@@ -37,24 +37,33 @@ jobs:
 
       # Run under dash where available. bash is forgiving about constructs that
       # dash rejects, so passing under bash alone would not prove portability.
-      # Results also go to the job summary, which is readable without signing in.
-      # A test suite whose failures are only visible to the maintainer is not much
-      # of a public trust signal.
+      # Results go to the job summary AND, on failure, to workflow annotations.
+      # Annotations render on the run page without signing in; raw logs do not.
+      # A test suite whose failures are only visible to the maintainer is a weak
+      # public trust signal — and it made the first red run undiagnosable from
+      # outside the repository.
       - name: Run tripwire tests
         run: |
           status=0
+          out=$(mktemp)
           {
-            echo '## `${{ matrix.os }}`'
-            echo
             if command -v dash >/dev/null 2>&1; then
-              echo '### dash'; echo '```'
+              echo "=== dash ==="
               dash tests/tripwire/run.sh 2>&1 || status=1
-              echo '```'
             fi
-            echo '### sh'; echo '```'
+            echo "=== sh ==="
             sh tests/tripwire/run.sh 2>&1 || status=1
-            echo '```'
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+          } > "$out"
+          cat "$out"
+          { echo "## \`${{ matrix.os }}\`"; echo '```'; cat "$out"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ]; then
+            grep -A2 '^  FAIL' "$out" | while IFS= read -r line; do
+              printf '::error title=tripwire (%s)::%s\n' "${{ matrix.os }}" "$line"
+            done
+            grep -E '^[0-9]+ passed' "$out" | while IFS= read -r line; do
+              printf '::error title=tripwire result (%s)::%s\n' "${{ matrix.os }}" "$line"
+            done
+          fi
           exit $status
 
       - name: Reject GNU-only regex escapes
