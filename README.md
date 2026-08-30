@@ -159,15 +159,27 @@ wrote — not the audit, just enough to know whether one is worth running.
              Run /vibeproof diff to verify.
 ```
 
-When nothing trips, it prints **nothing at all**. It fires after every turn, so it
-had to be nearly silent or it would be disabled within a day.
+When you clean it up, it says so once — and keeps count:
+
+```
+✓ VibeProof  2 flagged patterns no longer present. (14 cleared in this repo.)
+```
+
+When nothing trips and nothing changed, it prints **nothing at all**. It fires after
+every turn, so it had to be nearly silent or it would be disabled within a day.
+
+Note the wording: *"no longer present"*, not *"fixed by VibeProof"*. The tool did not
+write your fix. Taking credit for it would be exactly the kind of small lie it exists
+to find.
 
 ```bash
 ./install.sh --with-hook
 ```
 
-Opt-in by design — it will show you the snippet, not edit your settings behind
-your back.
+Opt-in by design — it shows you the snippet, it does not edit your settings behind
+your back. State lives in `~/.vibeproof/`, never in your repository: a tool whose
+first rule is *never modify your code* should not leave litter in your working tree
+either.
 
 ---
 

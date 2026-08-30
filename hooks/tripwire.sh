@@ -73,8 +73,43 @@ if [ "${used:-0}" -gt "${checked:-0}" ]; then
   note "$((used - checked))" "fetch result used without checking status"
 fi
 
-[ "$hits" -gt 0 ] || exit 0
+# ── Memory ───────────────────────────────────────────────────────────────────
+# The tripwire remembers its last count so it can tell you when something you were
+# warned about is gone. That closing note is the moment the tool proves its worth —
+# without it you only ever hear complaints.
+#
+# It reports a FACT ("no longer present"), never credit ("fixed thanks to us").
+# VibeProof did not write the fix; claiming it would be exactly the kind of small
+# lie this tool exists to find.
+# State lives OUTSIDE the audited repository, keyed by its root path.
+# Writing counters into someone's working tree would show up in git status and,
+# eventually, in a commit. A tool whose first rule is "never modify your code"
+# should not leave litter behind either.
+REPO=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+KEY=$(printf '%s' "$REPO" | tr -c 'A-Za-z0-9' '_' | tail -c 60)
+STATE_DIR="${VIBEPROOF_STATE:-$HOME/.vibeproof/state}"
+STATE="$STATE_DIR/$KEY"
+prev=0
+[ -f "$STATE" ] && prev=$(cat "$STATE" 2>/dev/null | tr -dc '0-9') && prev=${prev:-0}
 
-printf '\n\033[33m⚠ VibeProof\033[0m  %d suspicious pattern%s in the code just written (%s).\n            Run \033[1m/vibeproof diff\033[0m to verify.\n' \
-  "$hits" "$([ "$hits" -eq 1 ] || printf s)" "$top"
+if [ "$hits" -gt 0 ]; then
+  mkdir -p "$STATE_DIR" 2>/dev/null
+  printf '%s' "$hits" > "$STATE" 2>/dev/null
+  printf '\n\033[33m⚠ VibeProof\033[0m  %d suspicious pattern%s in the code just written (%s).\n            Run \033[1m/vibeproof diff\033[0m to verify.\n' \
+    "$hits" "$([ "$hits" -eq 1 ] || printf s)" "$top"
+  exit 0
+fi
+
+# Nothing trips now. Say something only if something tripped before.
+if [ "$prev" -gt 0 ]; then
+  rm -f "$STATE" 2>/dev/null
+  # Cumulative ledger — how much this tool has actually caught over time.
+  total=0
+  [ -f "$STATE.cleared" ] && total=$(cat "$STATE.cleared" 2>/dev/null | tr -dc '0-9')
+  total=$(( ${total:-0} + prev ))
+  mkdir -p "$STATE_DIR" 2>/dev/null
+  printf '%s' "$total" > "$STATE.cleared" 2>/dev/null
+  printf '\n\033[32m✓ VibeProof\033[0m  %d flagged pattern%s no longer present. (%d cleared in this repo.)\n' \
+    "$prev" "$([ "$prev" -eq 1 ] || printf s)" "$total"
+fi
 exit 0
