@@ -193,6 +193,10 @@ to claim:
 | `negative-proof.md` | Any finding that rests on something being absent |
 | `challenge.md` | Every proposed BLOCKER, before it is published |
 
+Security mode adds five more, all routed from `security.md`:
+`secrets-and-egress.md` · `authorization.md` · `source-hygiene.md` ·
+`fix-prompts.md`
+
 **`false-positives.md` is not optional.** Most bad audits come from flagging test
 fixtures, Storybook stories, seed scripts, and intentional demo modes.
 
@@ -305,9 +309,12 @@ findings rather than quietly dropping them.
 
 | Command | Scope |
 |---|---|
-| `/vibeproof` | Whole repository |
+| `/vibeproof` | Whole repository — does it actually work? |
 | `/vibeproof diff` | Only what changed vs. the default branch (`git diff`) |
 | `/vibeproof feature <name>` | One flow, traced end to end |
+| `/vibeproof security` | Is it safe to ship? — see `references/security.md` |
+| `/vibeproof security verify <id>` | Re-check one security finding against current code |
+| `/vibeproof security clean` | Source hygiene only. The one command that writes |
 
 `diff` mode is the one to use in a PR: it answers "did this change ship a lie?"
 rather than re-litigating the whole codebase.
@@ -326,9 +333,33 @@ performance tuning, dependency version bumps. Other tools do those well. Saying
 "this component is too long" in a VibeProof report dilutes the findings that
 actually block a release.
 
-Security appears here **only** where it is a broken promise — auth that is checked
-in the browser and not on the server, an admin route with no guard. Full security
-review is a different tool.
+### Security
+
+`/vibeproof` and `/vibeproof security` are two halves of one question, and they
+share this file's evidence rules, severity model and INCONCLUSIVE gate rather than
+restating them:
+
+```
+does it actually work?   →  /vibeproof
+is it safe to ship?      →  /vibeproof security
+```
+
+A dead button lies about what the product does; a client-side admin check lies
+about who it lets in. Both are gaps between a visible promise and the actual
+implementation, which is why they belong to the same tool.
+
+The security mode is still **not** a general scanner. It targets how apps built by
+Claude, Cursor, Lovable, Bolt and Replit actually fail: a service key behind a
+public env prefix, an endpoint that checks login but not ownership, a storage
+bucket left open, a row policy that was never written. Not dependency CVEs, not
+cryptographic review, not compliance.
+
+It never reports ✅ SAFE. The strongest verdict available is **NO SHIP-BLOCKING
+FINDINGS DETECTED**, because no static pass can certify an application — and the
+gap between "found nothing" and "there is nothing" is exactly what this tool
+exists to refuse to blur.
+
+Start at `references/security.md`; it routes to the rest.
 
 ---
 

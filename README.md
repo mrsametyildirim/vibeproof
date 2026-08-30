@@ -97,8 +97,8 @@ cp -r skills/vibeproof ~/.cursor/skills/        # Cursor
 cp -r skills/vibeproof ~/.codex/skills/         # Codex
 ```
 
-It is one `SKILL.md` plus seven reference files. Nothing to build, nothing to run,
-nothing that phones home.
+It is one `SKILL.md` plus fourteen reference files. Nothing to build, nothing to
+run, nothing that phones home.
 
 ---
 
@@ -109,6 +109,9 @@ nothing that phones home.
 | `/vibeproof` | Audit the whole repository |
 | `/vibeproof diff` | Audit only what changed vs. the default branch |
 | `/vibeproof feature checkout` | Trace one flow end to end |
+| `/vibeproof security` | The other half — is it safe to ship? |
+| `/vibeproof security verify VG-003` | Re-check one finding after you fix it |
+| `/vibeproof security clean` | Remove conversational residue and invisible characters |
 
 ```
 /vibeproof feature authentication
@@ -227,6 +230,41 @@ prove is downgraded to `UNPROVEN` and says what would confirm it. Every report e
 with a coverage section listing what it could *not* check.
 
 A tool that cries wolf gets uninstalled after one run.
+
+---
+
+## Two halves of one question
+
+```
+Built with AI?   Prove it works.   Prove it's safe.   Then ship it.
+```
+
+| | |
+|---|---|
+| `/vibeproof` | **Does it actually work?** Fake features, dead UI, fake persistence, broken wiring, false success |
+| `/vibeproof security` | **Is it safe to ship?** Exposed keys, ownership checks that were never written, open storage, client-side auth |
+
+One skill, one evidence standard. A dead button lies about what the product does;
+a client-side admin check lies about who it lets in — both are gaps between the
+visible promise and the implementation.
+
+The security half targets how AI-built apps actually fail:
+
+```
+🔴 BROKEN AUTHORIZATION            app/api/projects/delete/route.ts:14
+
+   Authentication is enforced; ownership is not. The project id comes from the
+   request body and is used directly in the delete. An authenticated user can
+   delete another user's project by changing one value.
+
+   FIX PROMPT — CLAUDE CODE ▾   FIX PROMPT — LOVABLE ▾
+```
+
+Then `/vibeproof security verify VG-003` re-checks it against the code as it is
+now — not against what you said you changed.
+
+It never prints ✅ SAFE. The strongest verdict is **NO SHIP-BLOCKING FINDINGS
+DETECTED**, because no static pass can certify an application.
 
 ---
 
