@@ -1,0 +1,13 @@
+{
+  "id": "no-lockfile-ci-install",
+  "family": "dependencies",
+  "kind": "bug",
+  "pairs_with": "lockfile-ci-clean-install",
+  "product_status": "MISCONFIGURED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "risk",
+  "primary_category": "dependencies",
+  "rule_id": "VP-DEP-001",
+  "track": "health",
+  "note": "No lockfile plus npm install in the deploy job: every deploy resolves differently and a compromised patch release lands silently. The action is pinned to a mutable tag as well. No CVE claim is made — none was checked."
+}

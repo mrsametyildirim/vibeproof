@@ -1,0 +1,9 @@
+name: deploy
+on: { push: { branches: [main] } }
+jobs:
+  ship:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: some-vendor/deploy-action@4f9c2a1b8e3d5f6a7b8c9d0e1f2a3b4c5d6e7f80
+      - run: npm ci && npm run build && npm run deploy

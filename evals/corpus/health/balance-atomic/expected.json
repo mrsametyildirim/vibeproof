@@ -1,0 +1,9 @@
+{
+  "id": "balance-atomic",
+  "family": "reliability",
+  "kind": "control",
+  "pairs_with": "balance-race",
+  "product_status": "WORKING",
+  "expect_findings": 0,
+  "note": "The balance condition moved into the WHERE clause, so the check and the write are one operation."
+}

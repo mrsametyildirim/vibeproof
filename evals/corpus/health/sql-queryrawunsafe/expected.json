@@ -1,0 +1,13 @@
+{
+  "id": "sql-queryrawunsafe",
+  "family": "injection",
+  "kind": "bug",
+  "pairs_with": "sql-queryraw-tagged",
+  "product_status": "EXPOSED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "blocker",
+  "primary_category": "injection",
+  "rule_id": "VP-IN-001",
+  "track": "security",
+  "note": "$queryRawUnsafe does not parameterise. Reachable with request input, so it scores on the Security track rather than Health."
+}

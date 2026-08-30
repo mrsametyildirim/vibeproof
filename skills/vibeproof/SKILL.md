@@ -314,6 +314,8 @@ findings rather than quietly dropping them.
 | `/vibeproof diff` | Only what changed vs. the default branch (`git diff`) |
 | `/vibeproof feature <name>` | One flow, traced end to end |
 | `/vibeproof security` | Is it safe to ship? — see `references/security.md` |
+| `/vibeproof health` | Will it keep working? — dependencies, injection, reliability, code health |
+| `/vibeproof all` | Everything, one report. The pre-launch pass |
 | `/vibeproof security verify <id>` | Re-check one security finding against current code |
 | `/vibeproof security clean` | Source hygiene only. The one command that writes |
 
@@ -329,10 +331,27 @@ skip the repository-wide score — a single feature does not have one.
 
 **In scope:** does the product do what its interface says it does.
 
-**Out of scope:** code style, architecture opinions, test coverage percentages,
-performance tuning, dependency version bumps. Other tools do those well. Saying
-"this component is too long" in a VibeProof report dilutes the findings that
-actually block a release.
+**Also in scope**, on the Health track — the goal is one report a reader can act on
+without opening a second tool:
+
+| Reference | Covers |
+|---|---|
+| `dependencies.md` | Known vulnerabilities and supply chain. **Findings here only ever come from a tool that was actually run** — a CVE recalled from memory is fiction |
+| `injection.md` | SQL, command, path, SSRF, XSS, open redirect, mass assignment |
+| `reliability.md` | Unbounded queries, N+1, missing timeouts, races, rate limiting |
+| `code-health.md` | Only what hides a defect, disables a safety net, or is a landmine |
+
+**Still out of scope:** formatting, import order, file length, comment density,
+coverage percentage as a target, and opinions about folder structure. Those are a
+formatter's job, and putting them in a report trains the reader to skim past the
+finding that stops a release.
+
+The discipline that makes breadth survivable is **rationing**. `code-health.md`
+lists what meets its bar and counts the rest:
+
+```
+CODE HEALTH   4 findings · 61 style observations not listed
+```
 
 ### Security
 

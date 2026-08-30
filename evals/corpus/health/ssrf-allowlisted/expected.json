@@ -1,0 +1,9 @@
+{
+  "id": "ssrf-allowlisted",
+  "family": "injection",
+  "kind": "control",
+  "pairs_with": "ssrf-open-fetch",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "note": "Allow-list rather than a block-list, redirects refused so the allow-list cannot be escaped, and a timeout. Still a fetch of a caller-supplied URL."
+}

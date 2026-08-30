@@ -1,0 +1,9 @@
+{
+  "id": "paginated-query",
+  "family": "reliability",
+  "kind": "control",
+  "pairs_with": "unbounded-query",
+  "product_status": "WORKING",
+  "expect_findings": 0,
+  "note": "Bounded page size and a cursor. Same endpoint, same ORM."
+}

@@ -1,0 +1,13 @@
+{
+  "id": "balance-race",
+  "family": "reliability",
+  "kind": "bug",
+  "pairs_with": "balance-atomic",
+  "product_status": "BROKEN",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "blocker",
+  "primary_category": "reliability",
+  "rule_id": "VP-RL-005",
+  "track": "health",
+  "note": "Read, check, write with no transaction. Two concurrent requests both pass the check. Blocker because it involves credits — consequence sets severity, not the category."
+}

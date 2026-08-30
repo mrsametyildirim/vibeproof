@@ -12,9 +12,40 @@ catch.
 
 ---
 
+## Three tracks, one verdict
+
+The audit now covers more than promises, and a single number cannot carry that.
+Three scores, each with its own arithmetic:
+
+| Track | Covers | References |
+|---|---|---|
+| **Reality** | Does the product do what it says? | the five category files |
+| **Security** | Is the trust boundary held? | `security.md` and what it routes to |
+| **Health** | Will it keep working? | `dependencies.md` `injection.md` `reliability.md` `code-health.md` |
+
+They are kept separate for one reason: **dilution**. Sixty maintainability notes
+folded into the Reality Score would make the same number mean "this product lies"
+and "this variable is badly named". A score that means two things decides nothing.
+
+The **ship verdict is shared** — a blocker in any track blocks — and it is still
+the only thing that decides whether to ship. Three scores, one decision.
+
+```
+REALITY  87/100  🟡 MOSTLY REAL
+SECURITY 42/100  🔴 EXPOSED        ← 1 critical
+HEALTH   71/100  🟠
+
+SHIP VERDICT  ❌ DO NOT SHIP
+```
+
+Injection findings score into Security, not Health, when they are reachable with
+user input — they are boundary failures. Unreachable ones stay in Health.
+
+---
+
 ## Scoring
 
-Start at 100. Subtract per finding:
+Each track starts at 100. Subtract per finding, within its own track:
 
 | Severity | Penalty |
 |---|---|

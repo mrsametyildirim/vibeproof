@@ -97,8 +97,8 @@ cp -r skills/vibeproof ~/.cursor/skills/        # Cursor
 cp -r skills/vibeproof ~/.codex/skills/         # Codex
 ```
 
-It is one `SKILL.md` plus eighteen reference files. Nothing to build, nothing to
-run, nothing that phones home.
+It is one `SKILL.md` plus 22 reference files. Nothing to build, nothing to run,
+nothing that phones home.
 
 ---
 
@@ -299,14 +299,40 @@ catch.
 
 ---
 
-## What it is not
+## One report, three questions
 
-Not a linter. Not a security scanner. Not a code reviewer.
+```
+/vibeproof all
+```
 
-It will not tell you your component is too long, your tests are thin, or your
-dependencies are out of date. Other tools do that well.
+| Track | Question | Score |
+|---|---|---|
+| **Reality** | Does it do what it says? | Fake features, dead UI, fake persistence, broken wiring, false success |
+| **Security** | Is the trust boundary held? | Secrets, ownership, row-level security, storage, the LLM boundary, deployment |
+| **Health** | Will it keep working? | Known CVEs, injection, unbounded queries, missing timeouts, races, code health |
 
-It answers one question: **is the thing on the screen actually connected to anything?**
+Three scores, **one verdict** — a blocker in any track blocks:
+
+```
+REALITY  87/100  🟡 MOSTLY REAL
+SECURITY 42/100  🔴 EXPOSED        ← 1 critical
+HEALTH   71/100  🟠
+
+SHIP VERDICT  ❌ DO NOT SHIP
+```
+
+They stay separate on purpose. Sixty maintainability notes folded into the Reality
+Score would make one number mean both *this product lies* and *this variable is
+badly named*, and a score that means two things decides nothing.
+
+**What it still refuses to be:** a formatter, a style guide, or a coverage target.
+Import order and file length are a linter's job, and putting them in this report
+trains you to skim past the finding that stops the release. Code health lists what
+hides a defect and counts the rest.
+
+**And it never invents a CVE.** Dependency findings come from `npm audit`,
+`pip-audit`, `osv-scanner` and friends — actually run, output actually read. No
+auditor available means `UNVERIFIED`, not a clean bill of health.
 
 ---
 

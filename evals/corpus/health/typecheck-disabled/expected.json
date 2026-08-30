@@ -1,0 +1,14 @@
+{
+  "id": "typecheck-disabled",
+  "family": "code-health",
+  "kind": "bug",
+  "pairs_with": "typecheck-enforced",
+  "product_status": "BROKEN",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "blocker",
+  "primary_category": "code-health",
+  "rule_id": "VP-CH-001",
+  "track": "health",
+  "requires": "reading next.config.js, not only tsconfig.json",
+  "note": "tsconfig declares strict, so a check that reads only tsconfig reports a typechecked project. The build ignores every error, so it is green by construction — and any claim this audit makes about types rests on it."
+}

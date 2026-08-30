@@ -1,0 +1,9 @@
+{
+  "id": "lockfile-ci-clean-install",
+  "family": "dependencies",
+  "kind": "control",
+  "pairs_with": "no-lockfile-ci-install",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "note": "Lockfile present, npm ci rather than install, third-party action pinned to a commit. Same dependency ranges as the bug fixture."
+}

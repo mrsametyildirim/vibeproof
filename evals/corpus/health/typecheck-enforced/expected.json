@@ -1,0 +1,9 @@
+{
+  "id": "typecheck-enforced",
+  "family": "code-health",
+  "kind": "control",
+  "pairs_with": "typecheck-disabled",
+  "product_status": "WORKING",
+  "expect_findings": 0,
+  "note": "Identical tsconfig. The difference is entirely in the build config."
+}

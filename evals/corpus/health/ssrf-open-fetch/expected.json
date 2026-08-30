@@ -1,0 +1,13 @@
+{
+  "id": "ssrf-open-fetch",
+  "family": "injection",
+  "kind": "bug",
+  "pairs_with": "ssrf-allowlisted",
+  "product_status": "EXPOSED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "blocker",
+  "primary_category": "injection",
+  "rule_id": "VP-IN-004",
+  "track": "security",
+  "note": "The server fetches whatever the caller names, including cloud metadata at 169.254.169.254 and services on the private network."
+}

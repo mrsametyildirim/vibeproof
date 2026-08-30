@@ -1,0 +1,12 @@
+{
+  "id": "sql-queryraw-tagged",
+  "family": "injection",
+  "kind": "control",
+  "pairs_with": "sql-queryrawunsafe",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "must_not_report": [
+    "VP-IN-001"
+  ],
+  "note": "Visually the same interpolation. As a tagged template $queryRaw parameterises, so this is safe. The pair a pattern matcher gets wrong."
+}

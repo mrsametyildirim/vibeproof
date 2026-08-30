@@ -1,0 +1,13 @@
+{
+  "id": "unbounded-query",
+  "family": "reliability",
+  "kind": "bug",
+  "pairs_with": "paginated-query",
+  "product_status": "BROKEN",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "risk",
+  "primary_category": "reliability",
+  "rule_id": "VP-RL-001",
+  "track": "health",
+  "note": "Correct on the demo dataset. The endpoint stops responding once the events table grows, which is the failure mode the whole tool is about: written against twelve rows, shipped to production."
+}
