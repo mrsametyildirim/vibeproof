@@ -27,9 +27,18 @@
 #     credential lost to a no-op button in the same file. Signals now carry an
 #     explicit priority and the highest one wins.
 #
-# Known limit: a filename containing a literal newline is still skipped. That is
-# vanishingly rare and the fix would cost POSIX portability (`read -d ''` is a
-# bashism). Spaces, tabs, quotes and unicode all work.
+# Paths come from git as NUL-delimited (-z) and are converted to lines. This is not
+# cosmetic: without -z, git C-quotes any path containing a control character or a
+# non-ASCII byte, so `src/we'ird<TAB>name.js` arrives as the literal string
+#   "src/we'ird	name.js"
+# — quotes and backslash included — which is not a path that exists, and the file is
+# silently skipped. core.quotepath=false is NOT enough; it only suppresses the
+# non-ASCII escaping, never the control-character quoting. CI caught this on Linux
+# and macOS after it passed locally.
+#
+# Known limit: a filename containing a literal newline is still skipped. Handling it
+# would need `read -d ''`, a bashism, and this hook claims POSIX sh. Spaces, tabs,
+# quotes and unicode all work.
 #
 # Portability: POSIX sh. No GNU-only regex — `[[:space:]]`, never `\s`.
 
@@ -54,9 +63,9 @@ NOT_PRODUCT='(^|/)(tests?|spec|__tests__|__mocks__|mocks|fixtures|seeds|node_mod
 LIST=$(mktemp 2>/dev/null) || exit 0
 trap 'rm -f "$LIST"' EXIT INT TERM
 
-{ git -c core.quotepath=false diff --name-only --diff-filter=ACM HEAD 2>/dev/null
-  git -c core.quotepath=false ls-files --others --exclude-standard 2>/dev/null
-} | sort -u \
+{ git diff -z --name-only --diff-filter=ACM HEAD 2>/dev/null
+  git ls-files -z --others --exclude-standard 2>/dev/null
+} | tr '\0' '\n' | sort -u \
   | grep -Ei "$SRC_EXT" \
   | grep -Eiv "$NOT_PRODUCT" \
   | grep -Eiv '\.(test|spec|stories)\.' \
@@ -65,7 +74,7 @@ trap 'rm -f "$LIST"' EXIT INT TERM
 # Deletions are tracked separately. A removed route or handler cannot be scanned
 # for its contents, but deleting one is an effective way to break wiring that
 # still exists elsewhere — exactly what the audit looks for.
-GONE=$(git -c core.quotepath=false diff --name-only --diff-filter=D HEAD 2>/dev/null \
+GONE=$(git diff -z --name-only --diff-filter=D HEAD 2>/dev/null | tr '\0' '\n' \
        | grep -Ei "$SRC_EXT" \
        | grep -Eiv "$NOT_PRODUCT" \
        | grep -Eic '(^|/)(app|pages|routes?|api|controllers?|handlers?)(/|$)|/route\.|/page\.')
