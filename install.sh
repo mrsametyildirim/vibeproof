@@ -59,12 +59,19 @@ if [ "$WITH_HOOK" -eq 1 ]; then
 else
   echo "Optional — get a nudge when the agent writes something suspicious:"
 fi
-cat <<'SNIP'
+
+# The path is expanded here on purpose. A snippet containing $HOME looks portable
+# but is silently dead on Windows: the hook runner does not expand it, sh receives
+# a literal '$HOME', fails to find the file, and exits 0 — so the hook appears
+# installed and never runs. Printing the resolved path avoids that entirely.
+HOME_FWD=$(printf '%s' "$HOME" | tr '\\' '/')
+cat <<SNIP
 
   "hooks": {
     "Stop": [{ "hooks": [{ "type": "command",
-      "command": "sh $HOME/.vibeproof/tripwire.sh" }] }]
+      "command": "sh \"$HOME_FWD/.vibeproof/tripwire.sh\"" }] }]
   }
 
 It stays silent unless something trips, and never modifies your code.
+If you already have a Stop hook, add this alongside it — do not replace it.
 SNIP
