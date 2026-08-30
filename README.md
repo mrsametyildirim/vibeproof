@@ -1,39 +1,41 @@
 <div align="center">
 
+<br>
+
 # VibeProof
 
-### Your app looks done. Prove it.
+**Your app looks done. Prove it.**
 
-Finds fake features, dead UI, fake persistence, broken wiring and false-success
-flows in AI-generated apps.
-
-**Zero config. Zero dependencies. Zero trust.**
-
-[![Agent Skill](https://img.shields.io/badge/Agent%20Skill-Claude%20Code%20%C2%B7%20Cursor%20%C2%B7%20Codex-2b7489)](#install)
-[![No dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)](#install)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+Finds fake features, dead UI, fake persistence, broken wiring and
+false-success flows in AI-generated apps.
 
 <br>
 
-<img src="assets/demo.png" alt="VibeProof report: reality score 87/100, one blocker — a login button linking to a route that does not exist" width="800">
+[![Agent Skill](https://img.shields.io/badge/agent_skill-claude_code_·_cursor_·_codex-3d4451?style=flat-square)](#install)
+[![Dependencies](https://img.shields.io/badge/dependencies-none-3d4451?style=flat-square)](#install)
+[![License](https://img.shields.io/badge/license-MIT-3d4451?style=flat-square)](LICENSE)
 
-<sub>A real run against a production Next.js site. The login button in the header
-pointed at a route that was never built.</sub>
+<br>
+
+<img src="assets/demo.png" width="820" alt="VibeProof terminal report — reality score 87 out of 100, one blocker: a login button linking to a route that does not exist">
+
+<sub><b>A real run against a production Next.js site.</b><br>
+The login button in the header pointed at a route that was never built.</sub>
+
+<br><br>
 
 </div>
 
----
-
-Your AI said it's done.
-Your UI looks done.
-
-Is it actually done?
+> Your AI said it's done.
+> Your UI looks done.
+>
+> **Is it actually done?**
 
 ```
 /vibeproof
 ```
 
-That's it. No npx. No API key. No setup.
+No npx. No API key. No config. One markdown file your agent reads.
 
 ---
 
@@ -53,7 +55,7 @@ looks finished and isn't:
 - Backend throws → `catch { return { success: true } }`
 - Edit profile → works, until you refresh
 
-None of that is a bug a linter can see. Every one of it ships.
+None of that is a bug a linter can see. Every one of them ships.
 
 ---
 
@@ -71,12 +73,12 @@ Wherever that chain breaks, it tells you the file and the line.
 
 ---
 
-## Example output
+## Example reports
 
-The screenshot above is a real run. The full report — findings, coverage, and the
-list of things that matched a pattern but were **correctly not reported** — is here:
-
-[Full example report →](examples/sample-report.md)  ·  [A real audit, including two near-misses →](examples/real-audit.md)
+| | |
+|---|---|
+| **[A real audit →](examples/real-audit.md)** | A production Next.js site, 95 routes. One blocker — and **two findings it refused to report** after tracing them to the end. |
+| **[Annotated example →](examples/sample-report.md)** | A full report with every section: contract, biggest lie, findings, coverage. |
 
 ---
 
