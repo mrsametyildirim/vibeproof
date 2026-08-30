@@ -9,6 +9,10 @@ flows in AI-generated apps.
 
 **Zero config. Zero dependencies. Zero trust.**
 
+[![Agent Skill](https://img.shields.io/badge/Agent%20Skill-Claude%20Code%20%C2%B7%20Cursor%20%C2%B7%20Codex-2b7489)](#install)
+[![No dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)](#install)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
 </div>
 
 ---
@@ -106,7 +110,7 @@ Your app looks more complete than it actually is.
 ## Install
 
 ```bash
-git clone https://github.com/YOUR_USER/vibeproof.git
+git clone https://github.com/mrsametyildirim/vibeproof.git
 cd vibeproof && ./install.sh
 ```
 
