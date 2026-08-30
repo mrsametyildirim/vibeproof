@@ -40,7 +40,9 @@
 # would need `read -d ''`, a bashism, and this hook claims POSIX sh. Spaces, tabs,
 # quotes and unicode all work.
 #
-# Portability: POSIX sh. No GNU-only regex — `[[:space:]]`, never `\s`.
+# Portability: POSIX sh, POSIX character classes only. GNU-only regex escapes are
+# rejected in CI, because BSD grep reads them as literal letters and the pattern
+# then silently matches nothing on macOS.
 
 set -u
 

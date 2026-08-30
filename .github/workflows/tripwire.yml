@@ -75,7 +75,14 @@ jobs:
       # ends up failing precisely when it has nothing to report.
       - name: Reject GNU-only regex escapes
         run: |
-          hits=$(grep -nE '\\[sdwSDW]' hooks/tripwire.sh || true)
+          # -F, not -E. The first version of this guard used the regex
+          #     grep -nE '\\[sdwSDW]'
+          # which matched nothing locally and matched on both CI runners against
+          # byte-identical content — a grep-dialect disagreement about what `\\`
+          # means. A check against regex-dialect bugs must not itself depend on
+          # regex dialect. Fixed strings have exactly one interpretation.
+          hits=$(LC_ALL=C grep -nF -e '\s' -e '\d' -e '\w' -e '\S' -e '\D' -e '\W' \
+                   hooks/tripwire.sh || true)
           if [ -n "$hits" ]; then
             printf '%s\n' "$hits"
             printf '::error title=portability (%s)::GNU-only regex escape in hooks/tripwire.sh — use [[:space:]]\n' "${{ matrix.os }}"
