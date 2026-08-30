@@ -66,12 +66,19 @@ jobs:
           fi
           exit $status
 
+      # GNU-only escapes are the portability trap this matrix exists to catch: BSD
+      # grep on macOS reads them as literal letters, so the pattern silently
+      # matches nothing and a check quietly stops working on half the platforms.
+      #
+      # `|| true` matters. Under `bash -e`, grep exiting 1 for "no matches" is the
+      # normal, expected case; letting that status reach the shell is how a guard
+      # ends up failing precisely when it has nothing to report.
       - name: Reject GNU-only regex escapes
         run: |
-          # \s \d \w are GNU extensions. BSD grep on macOS treats them as literal
-          # letters, so a pattern using them silently matches nothing there.
-          if grep -nE '\\[sdwSDW]' hooks/tripwire.sh; then
-            echo "GNU-only regex escape found in hooks/tripwire.sh — use [[:space:]] etc."
+          hits=$(grep -nE '\\[sdwSDW]' hooks/tripwire.sh || true)
+          if [ -n "$hits" ]; then
+            printf '%s\n' "$hits"
+            printf '::error title=portability (%s)::GNU-only regex escape in hooks/tripwire.sh — use [[:space:]]\n' "${{ matrix.os }}"
             exit 1
           fi
           echo "no GNU-only escapes"
