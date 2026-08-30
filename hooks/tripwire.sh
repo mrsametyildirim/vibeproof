@@ -57,7 +57,11 @@ note() {    # note <count> <label>
 #    is synchronous and entirely right, but matched "a call with no await".
 #    Excluding the synchronous families costs almost no real signal — network and
 #    persistence calls are not named setX / console.x / router.push.
-n=$(grep -rn -B1 -E 'toast\.success|setSuccess\(true\)|showSuccess|alert\("[^"]*(saved|success|deleted|sent)' $FILES 2>/dev/null \
+#    -H is required: with a single file grep omits the filename prefix, so the
+#    context lines come back as "1-code" instead of "file-1-code" and the filter
+#    below matches nothing. The check then passes silently on any single-file
+#    change — which is the most common case there is.
+n=$(grep -rHn -B1 -E 'toast\.success|setSuccess\(true\)|showSuccess|alert\("[^"]*(saved|success|deleted|sent)' $FILES 2>/dev/null \
     | grep -E '^[^:]+-[0-9]+-' \
     | grep -E '[a-zA-Z_$][A-Za-z0-9_.$]*\(' \
     | grep -vE 'await|\.then\(|\bset[A-Z]|console\.|router\.(push|replace|back)|dispatch\(|navigate\(|\breturn\b' \

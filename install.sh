@@ -53,25 +53,56 @@ mkdir -p "$HOME/.vibeproof"
 cp "$ROOT/hooks/tripwire.sh" "$HOME/.vibeproof/tripwire.sh"
 chmod +x "$HOME/.vibeproof/tripwire.sh" 2>/dev/null || true
 
-if [ "$WITH_HOOK" -eq 1 ]; then
-  echo "Tripwire copied to ~/.vibeproof/tripwire.sh"
-  echo "Add this to ~/.claude/settings.json to run it after each turn:"
-else
-  echo "Optional — get a nudge when the agent writes something suspicious:"
-fi
-
 # The path is expanded here on purpose. A snippet containing $HOME looks portable
 # but is silently dead on Windows: the hook runner does not expand it, sh receives
 # a literal '$HOME', fails to find the file, and exits 0 — so the hook appears
-# installed and never runs. Printing the resolved path avoids that entirely.
+# installed and never runs. Resolving it here avoids that entirely.
 HOME_FWD=$(printf '%s' "$HOME" | tr '\\' '/')
-cat <<SNIP
+HOOK_CMD="sh \"$HOME_FWD/.vibeproof/tripwire.sh\""
+SETTINGS="$HOME/.claude/settings.json"
+
+register_hook() {
+  command -v python >/dev/null 2>&1 && PY=python || PY=python3
+  command -v "$PY" >/dev/null 2>&1 || { echo "  python not found — add the snippet manually."; return 1; }
+  VP_SETTINGS="$SETTINGS" VP_CMD="$HOOK_CMD" "$PY" - <<'PY'
+import json, os, shutil, sys, time
+p, cmd = os.environ["VP_SETTINGS"], os.environ["VP_CMD"]
+d = {}
+if os.path.exists(p):
+    shutil.copy2(p, p + ".bak-" + time.strftime("%Y%m%d-%H%M"))
+    try:
+        d = json.load(open(p, encoding="utf-8"))
+    except ValueError:
+        print("  settings.json is not valid JSON — not touching it."); sys.exit(1)
+stop = d.setdefault("hooks", {}).setdefault("Stop", [])
+if any("tripwire" in json.dumps(g) for g in stop):
+    print("  already registered."); sys.exit(0)
+# Append. Never replace: an existing Stop hook is someone else's working setup.
+stop.append({"hooks": [{"type": "command", "command": cmd}]})
+os.makedirs(os.path.dirname(p), exist_ok=True)
+json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+print("  hook registered in ~/.claude/settings.json (previous file backed up).")
+PY
+}
+
+if [ "$WITH_HOOK" -eq 1 ]; then
+  echo "Registering the tripwire…"
+  register_hook
+  echo
+  echo "It stays silent unless something trips, and never modifies your code."
+else
+  cat <<SNIP
+Optional — get a nudge when the agent writes something suspicious:
+
+  ./install.sh --with-hook
+
+or add this to ~/.claude/settings.json yourself, alongside any existing Stop hook:
 
   "hooks": {
     "Stop": [{ "hooks": [{ "type": "command",
-      "command": "sh \"$HOME_FWD/.vibeproof/tripwire.sh\"" }] }]
+      "command": "$HOOK_CMD" }] }]
   }
 
 It stays silent unless something trips, and never modifies your code.
-If you already have a Stop hook, add this alongside it — do not replace it.
 SNIP
+fi

@@ -95,7 +95,7 @@ cp -r skills/vibeproof ~/.cursor/skills/        # Cursor
 cp -r skills/vibeproof ~/.codex/skills/         # Codex
 ```
 
-It is one `SKILL.md` plus six reference files. Nothing to build, nothing to run,
+It is one `SKILL.md` plus seven reference files. Nothing to build, nothing to run,
 nothing that phones home.
 
 ---
@@ -150,13 +150,16 @@ write your fix. Taking credit for it would be exactly the kind of small lie it e
 to find.
 
 ```bash
-./install.sh --with-hook
+./install.sh --with-hook     # registers it, backing up settings.json first
+./install.sh                 # prints the snippet, changes nothing
 ```
 
-Opt-in by design — it shows you the snippet, it does not edit your settings behind
-your back. State lives in `~/.vibeproof/`, never in your repository: a tool whose
-first rule is *never modify your code* should not leave litter in your working tree
-either.
+Opt-in by design: the plain install never touches your settings. `--with-hook`
+appends to any existing `Stop` hook rather than replacing it, backs up
+`settings.json`, and is safe to run twice.
+
+State lives in `~/.vibeproof/`, never in your repository — a tool whose first rule
+is *never modify your code* should not leave litter in your working tree either.
 
 ---
 
