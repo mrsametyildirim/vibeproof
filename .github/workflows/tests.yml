@@ -99,17 +99,16 @@ jobs:
       - name: Check the eval corpus
         run: sh evals/run-check.sh
 
-      # The README has stated the wrong reference-file count three times: it said
-      # six when there were seven, seven when there were fourteen, and eighteen
-      # when there were twenty-two. VibeProof found the first one in itself. A
-      # number a human maintains by hand drifts; a number CI checks does not.
+      # The README has stated the wrong reference-file count three times: six when
+      # there were seven, seven when there were fourteen, eighteen when there were
+      # twenty-two. VibeProof found the first one in itself. A number a human
+      # maintains by hand drifts; a number CI checks does not.
       - name: README reference count is true
         run: |
           actual=$(ls skills/vibeproof/references/*.md | wc -l | tr -d ' ')
-          claimed=$(sed -n 's/.*plus \([0-9][0-9]*\) reference files.*//p' README.md | head -1)
+          claimed=$(grep -oE 'plus [0-9]+ reference files' README.md | grep -oE '[0-9]+' | head -1)
           echo "claimed=$claimed actual=$actual"
           if [ "$claimed" != "$actual" ]; then
-            printf '::error title=README::claims %s reference files, there are %s
-' "$claimed" "$actual"
+            echo "::error title=README::claims $claimed reference files, there are $actual"
             exit 1
           fi
