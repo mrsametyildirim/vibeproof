@@ -1,7 +1,14 @@
 # Report Format
 
-Two people running VibeProof on the same commit must produce the same score.
-The score is **arithmetic over counted findings**, never an impression.
+`scoring_version: 2`
+
+The same **confirmed finding set** always produces the same score. The score is
+arithmetic over counted findings, never an impression.
+
+It is *not* claimed that the same commit always produces the same score: working out
+which promises an app makes is model reasoning, not parsing, so the finding set
+itself can vary. Overstating that would be the same class of lie this tool exists to
+catch.
 
 ---
 
@@ -18,6 +25,14 @@ Start at 100. Subtract per finding:
 Floor the result at 0. Do not round, weight, or "adjust for context". If the number
 feels wrong, the findings are wrong — fix the findings, not the number.
 
+Two rules on what gets counted at all:
+
+- **One root cause = one scored finding.** A dead `Export` button that qualifies as
+  Ghost UI *and* Fake Feature *and* Broken Wiring is one finding with one primary
+  category and two tags. Three real defects must not read as nine.
+- **`SUSPECTED` findings are not scored.** They can be listed as worth a look; they
+  do not move the number.
+
 **Reality Score bands:**
 
 | Score | Band |
@@ -28,13 +43,38 @@ feels wrong, the findings are wrong — fix the findings, not the number.
 | 25–49 | 🔴 **MOSTLY FAKE** |
 | 0–24 | 🎭 **BEAUTIFUL LIE** |
 
-**Ship verdict** is decided by blockers alone — a score cannot override it:
+## Ship verdict
 
-- **1 or more BLOCKERS** → ❌ **DO NOT SHIP**
-- **0 blockers, 1+ risks** → ⚠️ **SHIP WITH KNOWN GAPS**
-- **0 blockers, 0 risks** → ✅ **SHIP**
+The score never decides this. Evaluate **in order** and stop at the first match:
 
-Remember the constraint from SKILL.md: only a **PROVEN** finding may be a BLOCKER.
+| # | Condition | Verdict |
+|---|---|---|
+| 1 | One or more verified BLOCKERs | ❌ **DO NOT SHIP** |
+| 2 | A critical promise went untraced | ❔ **INCONCLUSIVE** |
+| 3 | A layer required by an in-scope promise was unavailable | ❔ **INCONCLUSIVE** |
+| 4 | A non-destructive build/typecheck exists but could not be verified | ❔ **INCONCLUSIVE** |
+| 5 | No blockers, but verified risks exist | ⚠️ **SHIP WITH KNOWN GAPS** |
+| 6 | No blockers, no risks, coverage sufficient | ✅ **SHIP** |
+
+**Finding nothing is not the same as there being nothing.** Zero findings over a
+third of the codebase is not a pass — it is an unfinished audit, and it says so.
+
+A high Reality Score never overrides INCONCLUSIVE. Print the score anyway; it
+describes what was examined, not what was concluded:
+
+```
+         REALITY SCORE  94/100
+                🟢 REAL
+
+         SHIP VERDICT  ❔ INCONCLUSIVE
+         3 of 5 critical promises traced · backend not present
+```
+
+That report is *less* trustworthy for shipping than an 87/100 with full coverage and
+two named gaps. Say so when it comes up.
+
+Remember the blocker gate from SKILL.md: verified evidence, production-reachable,
+user-visible, critical consequence, and a passed challenge. All five.
 
 ---
 
@@ -61,8 +101,9 @@ Remember the constraint from SKILL.md: only a **PROVEN** finding may be a BLOCKE
 ### Biggest Lie
 
 The single finding where the gap between what the interface says and what the code
-does is widest. One per report. Always a BLOCKER. If there are no blockers, omit the
-section entirely — do not promote something to fill it.
+does is widest. One per report. **Always a verified BLOCKER** — never a `SUSPECTED`
+or `PARTIAL` finding, however dramatic it would be if true. If there are no
+blockers, omit the section entirely — do not promote something to fill it.
 
 ```
 ─────────────────────────────────────────
@@ -115,16 +156,48 @@ this tool exists to catch.
 ─────────────────────────────────────────
 COVERAGE
 ─────────────────────────────────────────
-Files read           128 / 214
-Promises traced       18 / 18
-Build                 ✅ ran, passed  (npm run build)
-Tests                 ⏭️ not run (no test script)
+Files read              128 / 214
+Promises traced          17 / 19
+Critical promises         5 / 5      ← must be complete to SHIP
+Runtime verified          4 / 19
+Build                    ✅ ran, passed  (npm run build)
+Tests                    ⏭️ no test script
+Backend                  ✅ present in workspace
+External payment         ⚠️ not executed (Stripe)
 
 Not checked:
-  • server/ — separate repo, not present
   • src/legacy/ — 34 files, excluded as unreferenced
-  • external URLs — not verified by design
+  • admin console — separate repository, not present
 ```
+
+State the scope at the start of the audit too, and never phrase conclusions as
+though you examined more than you did:
+
+```
+AUDIT SCOPE   frontend ✅   api ✅   worker ✅
+              mobile ✗ not present   billing → external boundary
+```
+
+### Trust Summary
+
+End a full audit with what was actually done. This is more useful than a score:
+
+```
+─────────────────────────────────────────
+TRUST SUMMARY
+─────────────────────────────────────────
+Runtime evidence          3 flows
+Static evidence          14 flows
+Partial                   2 flows
+Critical promises         5 / 5 traced
+Negative proofs           2 completed
+Blockers challenged       1 / 1
+External boundaries       Stripe (not executed)
+Suppressed findings       0
+```
+
+Every line must be true of this run. A Trust Summary that overstates is worse than
+no Trust Summary, because it is the section a reader uses to calibrate the rest.
 
 ---
 
@@ -212,20 +285,40 @@ On request, write `.vibeproof/baseline.json`:
 
 ```json
 {
+  "scoring_version": 2,
   "commit": "a3f91c2",
   "date": "2026-08-30",
   "score": 64,
+  "verdict": "DO_NOT_SHIP",
+  "coverage": { "promises": [17, 19], "critical": [5, 5] },
   "findings": [
-    { "id": "VP-001", "file": "src/components/Profile.tsx", "line": 118,
-      "severity": "blocker", "category": "false-success",
-      "fingerprint": "false-success:Profile.tsx:deleteAccount" }
+    { "id": "VP-001",
+      "file": "src/components/Profile.tsx", "line": 118,
+      "severity": "blocker",
+      "product_status": "FAKE",
+      "evidence": "STATIC_VERIFIED",
+      "primary_category": "false-success",
+      "related_categories": ["ghost-ui"],
+      "promise": "Account deleted successfully",
+      "broken_hop": "RESULT → SUCCESS DECISION",
+      "root_cause": "unawaited-call",
+      "challenge_passed": true,
+      "fingerprint": "Account deleted successfully|RESULT→SUCCESS DECISION|unawaited-call|deleteAccount" }
   ]
 }
 ```
 
-`fingerprint` is `category:file:symbol` — deliberately **not** line-based, so a
-finding survives unrelated edits that shift line numbers. When a baseline exists,
-`/vibeproof diff` reports movement instead of a flat list:
+`fingerprint` is `promise | broken_hop | root_cause | symbol` — deliberately **not**
+line-based, so a finding survives unrelated edits that shift line numbers, and
+deliberately keyed on the *cause* so the same defect cannot re-enter under a second
+category. `product_status` and `evidence` are separate fields for the same reason
+they are separate axes in the report.
+
+Evidence belongs to a code state. If the implementation behind a finding changes,
+the earlier verification is stale — re-verify rather than carrying it forward.
+Yesterday's runtime proof is not proof of today's code.
+
+When a baseline exists, `/vibeproof diff` reports movement instead of a flat list:
 
 ```
   🔴 1 introduced      VP-011

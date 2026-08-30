@@ -122,29 +122,48 @@ is grep-based on purpose: no syntax tree, no dependencies, POSIX shell. It exist
 answer *"is an audit worth running?"* — never to be the audit.
 
 Grep-level matching means it will always both over- and under-report at the margins.
-That is accepted. The following are specific defects, found in external review, and
-they are real:
+That is accepted.
 
-**Filenames containing whitespace are skipped.** The changed-file list is passed to
-`grep` unquoted, so a path such as `src/a b.js` is split into two nonexistent paths
-and silently produces no match. This is a genuine false negative.
+### Fixed in v2
 
-**Fetch status checks are counted repository-wide, not per operation.** The check
-compares the total number of `fetch` calls against the total number of status checks
-across all changed files. An unrelated `if (res.ok)` in a different file therefore
-masks a genuinely unchecked `fetch` in another. Correlation needs to be per
-operation, or at minimum per file and local context.
+Five defects were found in external review. All were real, all are now fixed, and
+each has a regression test in `tests/tripwire/run.sh`:
 
-**"Strongest signal" is actually the first signal found.** The hook reports one
-representative pattern and describes it as the strongest, but it keeps whichever
-matched first. In a file containing both a no-op button and a hardcoded credential,
-it reports the no-op button. Signals need an explicit severity order.
+| Defect | Effect | Test |
+|---|---|---|
+| Changed-file list passed unquoted to `grep` | `src/a b.js` split into two nonexistent paths and was silently skipped | *filename with a space* |
+| `git` escapes non-ASCII paths by default | `src/ürün.jsx` came back as `"src/\303\274r\303\274n.jsx"` and could not be opened | *unicode filename* |
+| Fetch status checks correlated repository-wide | An unrelated `if (res.ok)` in another file masked a genuinely unchecked `fetch` | *unrelated res.ok does not mask* |
+| "Strongest signal" kept whichever matched **first** | A hardcoded credential lost to a no-op button in the same file | *credential outranks no-op button* |
+| Status check regex required the variable be named `res`/`response` | `const r = await fetch(...)`; `r.ok` was not recognised — a **false positive** | *checked fetch is quiet* |
 
-Two further gaps: the file-type filter misses `.mjs`, `.cjs`, `.mts` and `.cts`; and
-only added/copied/modified files are examined, so deleting a route or handler —
-which is a very effective way to break wiring — produces no signal at all.
+The last one was found by writing the test, not by review. It is the more
+interesting kind: the other four made the hook too quiet, this one made it cry wolf.
 
-These are scheduled, not disputed.
+Also added: `.mjs`/`.cjs`/`.mts`/`.cts`; Ant Design, notistack and plain status-setter
+success calls; and an advisory when a production route or handler is **deleted** —
+the hook cannot scan a file that is gone, but removing one is an effective way to
+break wiring that still exists.
+
+### Still true of v2
+
+**Per-file, not per-operation.** Two unrelated flows in the same file can still mask
+each other. Correlating per function would mean parsing, and parsing is what this
+hook exists to avoid.
+
+**Filenames containing a literal newline are still skipped.** The fix would require
+`read -d ''`, which is a bashism, and the hook claims POSIX `sh`. Spaces, tabs,
+quotes and unicode all work; a newline in a filename does not.
+
+**`examples/` and `demo/` are no longer excluded.** They usually are not product
+code — but "usually" is the wrong bar for a smell test. A missed signal means the
+audit never runs; a false one costs one line. That trade is deliberate and it does
+make the hook slightly noisier in repositories with large demo trees.
+
+Portability is tested rather than asserted: the suite runs on Ubuntu and macOS, under
+`dash` as well as `sh`, and CI fails the build if a GNU-only regex escape (`\s`,
+`\d`, `\w`) appears in the hook — BSD grep treats those as literal letters, so they
+would silently match nothing on macOS.
 
 ---
 

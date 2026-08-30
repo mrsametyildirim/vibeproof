@@ -1,0 +1,55 @@
+name: tripwire
+
+# The hook claims POSIX sh portability. Claiming it and testing it are different
+# things — GNU grep accepts regex that BSD grep on macOS does not, and that class
+# of bug is invisible on a single platform.
+#
+# This is CI infrastructure. It does not change the product promise: a VibeProof
+# user still installs nothing.
+
+on:
+  push:
+    paths:
+      - 'hooks/**'
+      - 'tests/**'
+      - '.github/workflows/tripwire.yml'
+  pull_request:
+    paths:
+      - 'hooks/**'
+      - 'tests/**'
+      - '.github/workflows/tripwire.yml'
+  workflow_dispatch:
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Shell and grep in use
+        run: |
+          echo "sh  -> $(command -v sh)"
+          grep --version 2>&1 | head -1 || true
+
+      # Run under dash where available. bash is forgiving about constructs that
+      # dash rejects, so passing under bash alone would not prove portability.
+      - name: Run tripwire tests
+        run: |
+          if command -v dash >/dev/null 2>&1; then
+            echo "--- dash ---"; dash tests/tripwire/run.sh
+          fi
+          echo "--- sh ---"; sh tests/tripwire/run.sh
+
+      - name: Reject GNU-only regex escapes
+        run: |
+          # \s \d \w are GNU extensions. BSD grep on macOS treats them as literal
+          # letters, so a pattern using them silently matches nothing there.
+          if grep -nE '\\[sdwSDW]' hooks/tripwire.sh; then
+            echo "GNU-only regex escape found in hooks/tripwire.sh — use [[:space:]] etc."
+            exit 1
+          fi
+          echo "no GNU-only escapes"

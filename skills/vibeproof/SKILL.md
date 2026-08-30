@@ -72,6 +72,26 @@ checking each one.
 Do not skip this. A finding that is not tied to a user-visible promise belongs in
 the Cleanups bucket at most.
 
+**Mark the critical promises explicitly.** A promise is critical when getting it
+wrong costs money, data, access, or trust:
+
+- payment and billing
+- destructive operations and account deletion
+- authentication and authorization
+- saving important user data
+- upload
+- irreversible external actions
+
+```
+CRITICAL           NORMAL
+[C1] Delete account       [N1] Change theme
+[C2] Upgrade subscription [N2] Sort projects
+[C3] Save billing details [N3] Collapse sidebar
+```
+
+This split is what justifies tracing some flows to the end while sampling others —
+and **every critical promise must be traced before you may issue SHIP.**
+
 ### Step 2 — Trace each promise
 
 For every promise, follow the chain and find where it stops:
@@ -87,17 +107,69 @@ where the chain breaks, or confirm it completes.
 A chain is **complete** only if the persisted result could survive a page refresh.
 Local state that never leaves the browser is not persistence.
 
-Classify the promise:
+Classify the promise on **two independent axes**. These answer different questions
+and must never be collapsed into one label.
 
-| Verdict | Meaning | Bar for claiming it |
-|---|---|---|
-| ✅ **PROVEN** | Chain complete end to end | You followed every hop |
-| ⚠️ **UNPROVEN** | Chain plausible but you could not verify a hop | Say which hop |
-| 🎭 **FAKE** | UI implies a real effect; code produces none | Quote the no-op |
-| 💥 **BROKEN** | Chain points at something that does not exist | Quote both sides |
+**Product status** — what the code does:
 
-When torn between UNPROVEN and FAKE, choose **UNPROVEN**. Uncertainty is a fact
-about your evidence, not about their code — report it as such.
+| Status | Meaning |
+|---|---|
+| ✅ **WORKING** | The chain completes |
+| ⚠️ **UNVERIFIED** | Not enough of the chain could be checked to make a claim |
+| 🎭 **FAKE** | The UI promises an effect; the code demonstrably produces none |
+| 💥 **BROKEN** | The chain points at something missing, invalid, or unreachable |
+
+**Evidence level** — how well you know it:
+
+| Evidence | Meaning |
+|---|---|
+| ● **RUNTIME VERIFIED** | Observed by actually running something and reading the result |
+| ◉ **STATIC VERIFIED** | Every necessary hop traced in source or config, nothing executed |
+| ◐ **PARTIAL** | Real evidence exists, but at least one necessary hop is unconfirmed |
+| ○ **SUSPECTED** | Pattern-level suspicion only |
+
+A feature can be genuinely `FAKE` with only `PARTIAL` evidence, or `WORKING` with
+merely `SUSPECTED` evidence. Those are different statements about different things.
+The old single-axis model conflated them, which is why the blocker rule used to read
+strangely — "only a PROVEN finding may be a BLOCKER" was mixing a product claim with
+an evidence claim.
+
+Two consequences:
+
+- `SUSPECTED` findings **do not affect the Reality Score.** They may be mentioned as
+  things worth a look; they are not counted.
+- `PARTIAL` findings may be reported and scored, but can **never** be a BLOCKER.
+
+Never write `RUNTIME VERIFIED` unless a command or flow actually ran and you read
+the result. Static inspection that merely looks conclusive is `STATIC VERIFIED`.
+
+When torn between `UNVERIFIED` and `FAKE`, choose **UNVERIFIED**. Uncertainty is a
+fact about your evidence, not about their code — report it as such.
+
+**Findings that rest on absence** — "no route", "no handler", "nothing consumes
+this" — must satisfy `references/negative-proof.md` before they may be `BROKEN` or
+`FAKE`. Not finding something is a fact about your search until the search was
+thorough enough to be worth reporting.
+
+### Step 2b — One root cause, one finding
+
+The five categories overlap on purpose: they describe the same product failure from
+different angles. A dead `Export` button is arguably Ghost UI *and* a Fake Feature
+*and* Broken Wiring.
+
+> **One root cause = one scored finding.**
+
+Pick the single category that best describes *why* it is broken, record the others as
+tags, and score it once. A user with three real defects should not see a score that
+implies nine.
+
+Identify a finding by:
+
+```
+promise + broken hop + root cause + symbol
+```
+
+Not by line number — line numbers move for unrelated reasons.
 
 ### Step 3 — Run the category checks
 
@@ -112,16 +184,55 @@ before reporting findings in it.
 | 💾 Fake Persistence | Changes that do not survive a refresh | `persistence.md` |
 | 💀 Ghost UI | Rendered controls that connect to nothing | `ghost-ui.md` |
 
-**Before writing any finding, check it against `references/false-positives.md`.**
-That file is not optional. Most bad audits come from flagging test fixtures,
-Storybook stories, seed scripts, and intentional demo modes.
+Three more reference files are not category checks but gates on what you are allowed
+to claim:
+
+| Reference | Applies to |
+|---|---|
+| `false-positives.md` | **Every finding, before it is written** |
+| `negative-proof.md` | Any finding that rests on something being absent |
+| `challenge.md` | Every proposed BLOCKER, before it is published |
+
+**`false-positives.md` is not optional.** Most bad audits come from flagging test
+fixtures, Storybook stories, seed scripts, and intentional demo modes.
+
+One correction to how that file is often read: a path like `examples/`, `demo/`,
+`scripts/`, `tools/` or `bin/` **lowers suspicion — it does not grant exemption.**
+`bin/` can be the shipped product. Before suppressing on location alone, ask whether
+the code is imported by production code, exposed as a route, invoked by a production
+script, packaged, or part of the real user flow. If any is true, the suppression is
+wrong. Tests, generated artifacts and vendored third-party output stay strongly
+excluded.
 
 ### Step 4 — Verify what you can actually run
 
 If a build/test/typecheck command exists in the project's manifest, run it and
-report the real result. A failing build outranks every other finding.
+report the real result. A failing build outranks every other finding. Running
+something is the only way to earn `RUNTIME VERIFIED`.
 
-Do not report "build passes" unless you ran it. Say "not run" instead.
+**Safe to run without asking:** build, typecheck, lint, existing unit and
+integration tests, local dev checks whose intent is clear from the manifest.
+
+**Never run automatically:** deploy, publish, database migrations or resets, seeds,
+billing actions, cloud mutations, anything that emails or messages real people, and
+anything requiring production credentials. An unknown command is not assumed safe.
+
+If proving a boundary would require a destructive or externally mutating command,
+mark that boundary `UNVERIFIED` and move on. Do not report "build passes" unless
+you ran it. Say "not run" instead.
+
+**External boundaries.** Many promises end outside the repository — Stripe, Clerk,
+Supabase, S3, a queue, a webhook. Finding an SDK call proves a call site exists. It
+does not prove the external effect happened. Report those separately:
+
+```
+Internal chain    ◉ STATIC VERIFIED   button → /api/checkout → stripe.sessions.create
+External effect   ⚠️ UNVERIFIED       Stripe interaction not executed
+```
+
+An unverified external boundary is not itself a finding. But if it sits on a
+critical promise, the run cannot honestly end in SHIP — see the verdict rules in
+`references/report-format.md`.
 
 ### Step 5 — Report
 
@@ -136,25 +247,57 @@ Then stream findings as you confirm them rather than holding everything to the e
 The trace is the interesting part: watching a promise get followed from a button to
 a missing route is more convincing than being handed a verdict.
 
-Use `references/report-format.md` exactly. Score is arithmetic, not judgement —
-see the formula there. Two people running VibeProof on the same commit must get
-the same score.
+Use `references/report-format.md` exactly. Score is arithmetic, not judgement — see
+the formula there. The same confirmed finding set always produces the same score.
+Working out *which* promises exist is reasoning rather than parsing, so do not claim
+the same commit always scores the same; it is not something this tool can guarantee.
+
+**Finding nothing is not the same as there being nothing.** If critical promises
+went untraced, a required layer was unavailable, or coverage was otherwise thin, the
+verdict is ❔ **INCONCLUSIVE** — not SHIP. A high Reality Score never overrides
+incomplete coverage. Saying "I could not verify this" is the tool working correctly.
 
 ---
 
 ## Severity
 
 Severity comes from **consequence to a user**, never from how the pattern looks.
+Category does not determine severity. The same technical defect changes severity
+entirely depending on what it is attached to:
 
-| Level | Test | Example |
+| Same defect | Attached to | Severity |
 |---|---|---|
-| 🔴 **BLOCKER** | Users lose data, lose money, or are lied to | "Payment successful" before the charge resolves |
-| 🟠 **RISK** | Feature silently fails or degrades | Error swallowed, user sees nothing |
-| 🟡 **CLEANUP** | Ugly but harmless | `console.log` in a handler |
+| Dead button | "Change theme" | 🟡 CLEANUP |
+| Dead button | "Delete account" | 🔴 BLOCKER |
+| Unchecked request | analytics preference | 🟠 RISK |
+| Unchecked request | followed by "Payment complete" | 🔴 BLOCKER |
 
-Hard constraint: **only a PROVEN finding may be a BLOCKER.** If you could not
-verify it, it is at most a RISK. This single rule is what keeps
-"DO NOT SHIP" meaningful.
+| Level | Test |
+|---|---|
+| 🔴 **BLOCKER** | Users lose data, lose money, or are told something happened that did not |
+| 🟠 **RISK** | Feature silently fails or degrades |
+| 🟡 **CLEANUP** | Ugly but harmless |
+
+Weigh reversibility, data loss, financial consequence, auth impact, external side
+effects, and whether the path is reachable in production.
+
+### The blocker gate
+
+A BLOCKER requires **all five**:
+
+1. Evidence is `STATIC VERIFIED` or `RUNTIME VERIFIED`
+2. The path is reachable in production
+3. A real user sees the promise
+4. The consequence is critical
+5. It survived a challenge pass — `references/challenge.md`
+
+Fail any one and it is at most a RISK. A `SUSPECTED` or `PARTIAL` finding can never
+be a BLOCKER no matter how bad it would be if true.
+
+The challenge pass is the important one: after writing a blocker, deliberately try
+to disprove it. The first pass searched for evidence the finding is *true*, which is
+precisely the search that misses the rewrite rule making it false. Report withdrawn
+findings rather than quietly dropping them.
 
 ---
 
