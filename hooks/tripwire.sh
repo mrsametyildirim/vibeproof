@@ -48,9 +48,20 @@ note() {    # note <count> <label>
 }
 
 # 1. Success announced next to a call that is not awaited.
-#    Looks for a success notification whose preceding line calls something plainly.
+#
+#    The preceding line must look like an OPERATION, not local bookkeeping.
+#    Without this filter the check fires on correct code: a React state setter
+#    placed before a legitimate success toast
+#        setNotes(fresh);
+#        toast.success("Deleted");
+#    is synchronous and entirely right, but matched "a call with no await".
+#    Excluding the synchronous families costs almost no real signal — network and
+#    persistence calls are not named setX / console.x / router.push.
 n=$(grep -rn -B1 -E 'toast\.success|setSuccess\(true\)|showSuccess|alert\("[^"]*(saved|success|deleted|sent)' $FILES 2>/dev/null \
-    | grep -E '^[^:]+-[0-9]+-' | grep -E '[a-zA-Z_$][A-Za-z0-9_.$]*\(' | grep -vc 'await\|\.then(' )
+    | grep -E '^[^:]+-[0-9]+-' \
+    | grep -E '[a-zA-Z_$][A-Za-z0-9_.$]*\(' \
+    | grep -vE 'await|\.then\(|\bset[A-Z]|console\.|router\.(push|replace|back)|dispatch\(|navigate\(|\breturn\b' \
+    | wc -l | tr -d ' ')
 note "${n:-0}" "success reported before await"
 
 # 2. catch/except that produces a success value.
