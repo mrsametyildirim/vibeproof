@@ -4,7 +4,10 @@
 
 set -eu
 
-SRC="$(cd "$(dirname "$0")" && pwd)/skills/vibeproof"
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+SRC="$ROOT/skills/vibeproof"
+WITH_HOOK=0
+[ "${1:-}" = "--with-hook" ] && WITH_HOOK=1
 
 if [ ! -f "$SRC/SKILL.md" ]; then
   echo "error: skills/vibeproof/SKILL.md not found next to this script." >&2
@@ -42,3 +45,26 @@ echo "VibeProof installed. Open a project and run:"
 echo
 echo "  /vibeproof"
 echo
+
+# ── Optional tripwire ────────────────────────────────────────────────────────
+# Deliberately opt-in. Editing someone's settings.json without asking is exactly
+# the kind of thing this tool exists to complain about.
+mkdir -p "$HOME/.vibeproof"
+cp "$ROOT/hooks/tripwire.sh" "$HOME/.vibeproof/tripwire.sh"
+chmod +x "$HOME/.vibeproof/tripwire.sh" 2>/dev/null || true
+
+if [ "$WITH_HOOK" -eq 1 ]; then
+  echo "Tripwire copied to ~/.vibeproof/tripwire.sh"
+  echo "Add this to ~/.claude/settings.json to run it after each turn:"
+else
+  echo "Optional — get a nudge when the agent writes something suspicious:"
+fi
+cat <<'SNIP'
+
+  "hooks": {
+    "Stop": [{ "hooks": [{ "type": "command",
+      "command": "sh $HOME/.vibeproof/tripwire.sh" }] }]
+  }
+
+It stays silent unless something trips, and never modifies your code.
+SNIP

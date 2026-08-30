@@ -125,6 +125,17 @@ Do not report "build passes" unless you ran it. Say "not run" instead.
 
 ### Step 5 — Report
 
+Show the **Product Contract first**, before any finding.
+
+This is not decoration. Seeing the tool correctly identify their app — its flows,
+its promises, in its own vocabulary — is what earns the reader's attention for the
+findings that follow. A list of grep hits reads as noise; the same list under
+"here are the 18 things your app promises a user" reads as an audit.
+
+Then stream findings as you confirm them rather than holding everything to the end.
+The trace is the interesting part: watching a promise get followed from a button to
+a missing route is more convincing than being handed a verdict.
+
 Use `references/report-format.md` exactly. Score is arithmetic, not judgement —
 see the formula there. Two people running VibeProof on the same commit must get
 the same score.

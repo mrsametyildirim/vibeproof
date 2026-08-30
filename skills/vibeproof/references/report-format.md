@@ -181,6 +181,63 @@ padding ("it is worth noting that"). State what is there, state what is missing.
 
 ---
 
+## Shareable artifacts
+
+Offer these at the end of a full run. Do not write files unless the user asks.
+
+### Badge
+
+Print a ready-to-paste snippet. Colour follows the band.
+
+```markdown
+![VibeProof](https://img.shields.io/badge/VibeProof-64%2F100_VIBEY-orange)
+```
+
+Colours: `brightgreen` REAL · `yellowgreen` MOSTLY REAL · `orange` VIBEY ·
+`red` MOSTLY FAKE · `black` BEAUTIFUL LIE.
+
+A badge is a claim the repo makes about itself, so it must be honest: only offer it
+after a run whose coverage was complete enough to stand behind. If you read half the
+files, say the badge would be misleading and skip it.
+
+### Committed record — `VIBEPROOF.md`
+
+On request, write the full report to `VIBEPROOF.md` in the repo root, with the commit
+SHA and date at the top. Committing it turns each audit into a diffable record:
+the next run's changes show up in `git diff`.
+
+### Baseline — regression tracking
+
+On request, write `.vibeproof/baseline.json`:
+
+```json
+{
+  "commit": "a3f91c2",
+  "date": "2026-08-30",
+  "score": 64,
+  "findings": [
+    { "id": "VP-001", "file": "src/components/Profile.tsx", "line": 118,
+      "severity": "blocker", "category": "false-success",
+      "fingerprint": "false-success:Profile.tsx:deleteAccount" }
+  ]
+}
+```
+
+`fingerprint` is `category:file:symbol` — deliberately **not** line-based, so a
+finding survives unrelated edits that shift line numbers. When a baseline exists,
+`/vibeproof diff` reports movement instead of a flat list:
+
+```
+  🔴 1 introduced      VP-011
+  ✅ 2 resolved        VP-004, VP-007
+  ⏸️ 6 unchanged
+```
+
+"Introduced" is the number that matters in review — it answers *did this change ship
+a lie?* without re-arguing findings the team already accepted.
+
+---
+
 ## Output rules
 
 - Plain text / markdown to the terminal. No file is written unless asked.

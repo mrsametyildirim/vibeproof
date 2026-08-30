@@ -146,6 +146,44 @@ AUTHENTICATION — REALITY
 
 ---
 
+## The tripwire
+
+You have to remember to run an audit. You don't have to remember to be interrupted.
+
+The optional `Stop` hook runs a two-second smell test on the files your agent just
+wrote — not the audit, just enough to know whether one is worth running.
+
+```
+⚠ VibeProof  3 suspicious patterns in the code just written
+             (catch block returning success).
+             Run /vibeproof diff to verify.
+```
+
+When nothing trips, it prints **nothing at all**. It fires after every turn, so it
+had to be nearly silent or it would be disabled within a day.
+
+```bash
+./install.sh --with-hook
+```
+
+Opt-in by design — it will show you the snippet, not edit your settings behind
+your back.
+
+---
+
+## Second opinion
+
+Run VibeProof with a **different agent than the one that wrote the code**.
+
+Cursor built it, Claude audits it. The model that wrote a bug is the model least
+likely to see it, because it already believes the code is correct — it produced
+the reasoning that led there.
+
+Because it is a plain Agent Skill, the same `SKILL.md` works in Claude Code,
+Cursor and Codex.
+
+---
+
 ## What it checks
 
 | Category | Catches |
