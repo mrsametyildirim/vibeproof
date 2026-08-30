@@ -201,8 +201,13 @@ Cursor and Codex.
 | 0–24 | 🎭 BEAUTIFUL LIE |
 
 The score is arithmetic, not opinion: every finding carries a fixed penalty, so the
-same commit always scores the same. The ship verdict is decided by blockers alone —
-a good score cannot override a blocker.
+same confirmed finding set always scores the same. The ship verdict is decided by
+blockers alone — a good score cannot override a blocker.
+
+Working out *which* promises exist is model reasoning, not parsing, so the finding
+set itself is not perfectly reproducible. That limit is
+[written down](KNOWN-LIMITATIONS.md#2-product-contract-discovery-is-not-deterministic)
+rather than papered over.
 
 ---
 
@@ -222,6 +227,20 @@ prove is downgraded to `UNPROVEN` and says what would confirm it. Every report e
 with a coverage section listing what it could *not* check.
 
 A tool that cries wolf gets uninstalled after one run.
+
+---
+
+## Trust model
+
+A tool whose entire claim is *"your app looks done, prove it"* does not get to be
+vague about its own gaps.
+
+**[How VibeProof audits itself →](KNOWN-LIMITATIONS.md)**
+
+Known blind spots, the tripwire's real defects, framework coverage, what it
+deliberately refuses to claim — and the three bugs it found in its own repository.
+
+> VibeProof prefers an explicit *"I could not verify this"* over invented certainty.
 
 ---
 
