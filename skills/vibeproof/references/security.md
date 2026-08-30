@@ -107,14 +107,26 @@ production-reachable, real exposure, critical consequence, and a passed
 3. **The trust boundary** — `authorization.md`. Authentication is not
    authorization, and a check written in a component is not a check.
 
-4. **Platform configuration** — `platform-supabase.md`. Row policies, storage
-   rules, anonymous permissions.
+4. **Platform configuration** — `platform-supabase.md`. The highest-yield area
+   there is: row-level security is off on at least one table in the large majority
+   of AI-generated apps, and with it off the anon key is a full read-write key
+   handed to every visitor.
 
-5. **Source hygiene** — `source-hygiene.md`. Prompt fragments, model-attribution
+5. **The LLM boundary** — `llm-boundary.md`. A model may propose an action; it may
+   never be the thing that decides the caller is allowed.
+
+6. **Deployment and transport** — `deployment.md`. Cookies, CORS, TLS, JWT, CI
+   permissions, containers. Configuration that ships and decides what the running
+   app permits.
+
+7. **Source hygiene** — `source-hygiene.md`. Prompt fragments, model-attribution
    comments and invisible characters left in shipped source.
 
-6. **Fix prompts** — `fix-prompts.md`. A finding the user cannot act on is half a
+8. **Fix prompts** — `fix-prompts.md`. A finding the user cannot act on is half a
    finding.
+
+Findings carry stable rule IDs (`rule-ids.md`) so they can be tracked across runs
+and suppressed narrowly — a rule and a target and a reason, never a bare directory.
 
 ---
 

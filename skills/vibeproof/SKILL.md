@@ -193,9 +193,10 @@ to claim:
 | `negative-proof.md` | Any finding that rests on something being absent |
 | `challenge.md` | Every proposed BLOCKER, before it is published |
 
-Security mode adds five more, all routed from `security.md`:
-`secrets-and-egress.md` · `authorization.md` · `source-hygiene.md` ·
-`fix-prompts.md`
+Security mode adds more, all routed from `security.md`:
+`secrets-and-egress.md` · `authorization.md` · `platform-supabase.md` ·
+`llm-boundary.md` · `deployment.md` · `source-hygiene.md` · `fix-prompts.md` ·
+`rule-ids.md`
 
 **`false-positives.md` is not optional.** Most bad audits come from flagging test
 fixtures, Storybook stories, seed scripts, and intentional demo modes.
@@ -351,8 +352,12 @@ implementation, which is why they belong to the same tool.
 The security mode is still **not** a general scanner. It targets how apps built by
 Claude, Cursor, Lovable, Bolt and Replit actually fail: a service key behind a
 public env prefix, an endpoint that checks login but not ownership, a storage
-bucket left open, a row policy that was never written. Not dependency CVEs, not
-cryptographic review, not compliance.
+bucket left open, a row policy that was never written, a language model whose
+output is treated as an authorization decision. Not dependency CVEs, not
+cryptographic review, not compliance, not style.
+
+The bar for adding anything here: **does it help distinguish reality from
+appearance?** Breadth is not the goal and never becomes one.
 
 It never reports ✅ SAFE. The strongest verdict available is **NO SHIP-BLOCKING
 FINDINGS DETECTED**, because no static pass can certify an application — and the

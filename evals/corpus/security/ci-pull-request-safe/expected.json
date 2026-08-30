@@ -1,0 +1,9 @@
+{
+  "id": "ci-pull-request-safe",
+  "family": "deployment",
+  "kind": "control",
+  "pairs_with": "ci-pull-request-target",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "note": "Fork code runs without secrets and with read-only permissions. Structurally almost the same workflow."
+}

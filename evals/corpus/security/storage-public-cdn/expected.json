@@ -1,0 +1,12 @@
+{
+  "id": "storage-public-cdn",
+  "family": "platform-supabase",
+  "kind": "control",
+  "pairs_with": "storage-public-sensitive",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "must_not_report": [
+    "VP-ST-001"
+  ],
+  "note": "A public bucket serving marketing images over a CDN. Public is the point."
+}

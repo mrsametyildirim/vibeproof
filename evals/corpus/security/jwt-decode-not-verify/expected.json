@@ -1,0 +1,12 @@
+{
+  "id": "jwt-decode-not-verify",
+  "family": "deployment",
+  "kind": "bug",
+  "pairs_with": "jwt-verify",
+  "product_status": "EXPOSED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "critical",
+  "primary_category": "authorization",
+  "rule_id": "VP-DP-004",
+  "note": "decode parses and verifies nothing. The payload is whatever the caller wrote, including role: admin. The code looks like it is doing the work."
+}

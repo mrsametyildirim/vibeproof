@@ -1,0 +1,9 @@
+{
+  "id": "jwt-verify",
+  "family": "deployment",
+  "kind": "control",
+  "pairs_with": "jwt-decode-not-verify",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "note": "One word different from the bug fixture, plus a pinned algorithm so a none-algorithm token is rejected."
+}

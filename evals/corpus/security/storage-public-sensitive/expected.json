@@ -1,0 +1,13 @@
+{
+  "id": "storage-public-sensitive",
+  "family": "platform-supabase",
+  "kind": "bug",
+  "pairs_with": "storage-public-cdn",
+  "product_status": "EXPOSED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "critical",
+  "primary_category": "platform-supabase",
+  "rule_id": "VP-ST-001",
+  "requires": "tracing what the upload path writes into the bucket",
+  "note": "public = true is identical in both fixtures. Only the contents differ, so the bucket flag alone cannot decide this."
+}

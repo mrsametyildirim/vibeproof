@@ -1,0 +1,13 @@
+{
+  "id": "ci-pull-request-target",
+  "family": "deployment",
+  "kind": "bug",
+  "pairs_with": "ci-pull-request-safe",
+  "product_status": "EXPOSED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "critical",
+  "primary_category": "deployment",
+  "rule_id": "VP-DP-005",
+  "requires": "recognising that pull_request_target plus a head.sha checkout runs fork code with secrets",
+  "note": "Neither line is dangerous alone. pull_request_target grants secrets; the checkout brings the fork's code into that context. Anyone opening a PR runs their own build script with DEPLOY_TOKEN."
+}

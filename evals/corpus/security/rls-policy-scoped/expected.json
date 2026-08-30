@@ -1,0 +1,9 @@
+{
+  "id": "rls-policy-scoped",
+  "family": "platform-supabase",
+  "kind": "control",
+  "pairs_with": "rls-policy-permits-all",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "note": "Same table, same columns. The only difference is the predicate in the policy."
+}

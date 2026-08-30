@@ -97,7 +97,7 @@ cp -r skills/vibeproof ~/.cursor/skills/        # Cursor
 cp -r skills/vibeproof ~/.codex/skills/         # Codex
 ```
 
-It is one `SKILL.md` plus fourteen reference files. Nothing to build, nothing to
+It is one `SKILL.md` plus eighteen reference files. Nothing to build, nothing to
 run, nothing that phones home.
 
 ---
@@ -249,6 +249,16 @@ a client-side admin check lies about who it lets in — both are gaps between th
 visible promise and the implementation.
 
 The security half targets how AI-built apps actually fail:
+
+| | |
+|---|---|
+| **Row-level security** | Off on at least one table in most AI-generated apps. With it off, the anon key is a full read-write key shipped to every visitor |
+| **Ownership** | Login is enforced, `project.userId === session.user.id` is not |
+| **Secrets** | Which side of the wire, not merely whether one exists — a Supabase anon key in the client is correct, a `service_role` key is total database access |
+| **The LLM boundary** | A model emits `refund`, and the refund happens. Nobody checked who asked |
+| **Deployment** | `pull_request_target` running fork code with your secrets, `jwt.decode` where `verify` was meant |
+| **Source hygiene** | Conversational residue and invisible characters left in shipped source |
+
 
 ```
 🔴 BROKEN AUTHORIZATION            app/api/projects/delete/route.ts:14

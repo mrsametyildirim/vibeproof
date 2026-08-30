@@ -1,0 +1,15 @@
+{
+  "id": "rls-policy-permits-all",
+  "family": "platform-supabase",
+  "kind": "bug",
+  "pairs_with": "rls-policy-scoped",
+  "product_status": "EXPOSED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "critical",
+  "primary_category": "platform-supabase",
+  "rule_id": "VP-SB-002",
+  "must_not_report": [
+    "VP-SB-001"
+  ],
+  "note": "RLS is enabled and a policy exists, so a check that stops at 'is RLS on' passes. using (true) matches every row, and the table holds email and phone. Must not be reported as VP-SB-001 (RLS disabled) — it is enabled."
+}

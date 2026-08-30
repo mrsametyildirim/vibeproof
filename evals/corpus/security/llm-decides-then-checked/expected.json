@@ -1,0 +1,12 @@
+{
+  "id": "llm-decides-then-checked",
+  "family": "llm-boundary",
+  "kind": "control",
+  "pairs_with": "llm-decides-refund",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "must_not_report": [
+    "VP-AI-001"
+  ],
+  "note": "Same prompt, same model, same tool. The ownership predicate after the response is the entire difference — injection changes what is proposed, never what is permitted."
+}
