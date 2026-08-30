@@ -13,6 +13,13 @@ flows in AI-generated apps.
 [![No dependencies](https://img.shields.io/badge/dependencies-none-brightgreen)](#install)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
+<br>
+
+<img src="assets/demo.png" alt="VibeProof report: reality score 87/100, one blocker — a login button linking to a route that does not exist" width="800">
+
+<sub>A real run against a production Next.js site. The login button in the header
+pointed at a route that was never built.</sub>
+
 </div>
 
 ---
@@ -66,44 +73,10 @@ Wherever that chain breaks, it tells you the file and the line.
 
 ## Example output
 
-```
-╭──────────────────────────────────────╮
-│              VIBEPROOF               │
-│                                      │
-│         REALITY SCORE  64/100        │
-│                🟠 VIBEY              │
-╰──────────────────────────────────────╯
+The screenshot above is a real run. The full report — findings, coverage, and the
+list of things that matched a pattern but were **correctly not reported** — is here:
 
-18 product promises traced
-
-  ✅  11  PROVEN
-  ⚠️   2  UNPROVEN
-  🎭   3  FAKE
-  💥   2  BROKEN
-
-─────────────────────────────────────────
-BIGGEST LIE
-─────────────────────────────────────────
-
-src/components/Profile.tsx:118
-
-    deleteAccount(user.id);
-    toast.success("Account deleted successfully");
-
-The UI reports success unconditionally. deleteAccount() is async and is never
-awaited, so the message fires whether the request succeeds, fails, or never
-resolves. A user who sees this believes their account is gone.
-
-─────────────────────────────────────────
-SHIP VERDICT
-─────────────────────────────────────────
-
-❌ DO NOT SHIP
-
-Your app looks more complete than it actually is.
-```
-
-[Full example report →](examples/sample-report.md)
+[Full example report →](examples/sample-report.md)  ·  [A real audit, including two near-misses →](examples/real-audit.md)
 
 ---
 

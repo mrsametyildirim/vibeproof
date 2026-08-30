@@ -1,0 +1,81 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>VibeProof</title>
+<style>
+  :root{
+    --bg:#0d1117; --chrome:#161b22; --line:#21262d;
+    --ink:#c9d1d9; --dim:#8b949e; --dim2:#484f58;
+    --red:#f85149; --amber:#d29922; --green:#3fb950; --blue:#58a6ff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#010409;padding:30px;
+       font-family:ui-monospace,"Cascadia Mono","JetBrains Mono",SFMono-Regular,Menlo,monospace}
+  .win{max-width:800px;margin:0 auto;border-radius:10px;overflow:hidden;
+       border:1px solid var(--line);box-shadow:0 22px 60px rgba(0,0,0,.65)}
+  .bar{background:var(--chrome);padding:10px 13px;display:flex;align-items:center;gap:7px;
+       border-bottom:1px solid var(--line)}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .t{font-size:11.5px;color:var(--dim2);margin-left:9px}
+  .body{background:var(--bg);color:var(--ink);padding:20px 22px 22px;
+        font-size:12.5px;line-height:1.6;white-space:pre-wrap}
+  .dim{color:var(--dim)} .dim2{color:var(--dim2)}
+  .red{color:var(--red)} .amber{color:var(--amber)} .green{color:var(--green)}
+  .blue{color:var(--blue)} .b{font-weight:700}
+  /* Score panel drawn with CSS, not box characters: emoji and box-drawing glyphs
+     have different advance widths, which broke the frame alignment. */
+  .score{display:inline-block;border:1px solid var(--dim2);border-radius:6px;
+         padding:11px 26px;margin:4px 0 2px;text-align:center;line-height:1.5}
+  .score .n{font-size:19px;font-weight:700;color:var(--amber)}
+  .score .lbl{font-size:11px;letter-spacing:.14em;color:var(--dim2)}
+  .score .band{font-size:11.5px;color:var(--amber);letter-spacing:.06em}
+  .rule{color:var(--dim2)}
+</style></head><body>
+<div class="win">
+  <div class="bar">
+    <span class="dot" style="background:#ff5f57"></span>
+    <span class="dot" style="background:#febc2e"></span>
+    <span class="dot" style="background:#28c840"></span>
+    <span class="t">~/tools-app — /vibeproof</span>
+  </div>
+  <div class="body"><span class="green b">❯</span> /vibeproof
+<div class="score"><span class="lbl">REALITY SCORE</span>
+<span class="n">87</span><span class="dim2"> / 100</span>
+<span class="band">MOSTLY REAL</span></div>
+<span class="dim">Next.js tool site · 95 routes · client-side conversion</span>
+
+<span class="b">12 promises traced</span>   <span class="green">11 proven</span>   <span class="red">1 broken</span>
+<span class="red b">1 blocker</span>   <span class="dim">0 risks</span>   <span class="dim">1 cleanup</span>
+
+<span class="rule">──────────────────────────────────────────────────</span>
+<span class="b red">BIGGEST LIE</span>
+<span class="rule">──────────────────────────────────────────────────</span>
+<span class="blue">src/components/layout/Header.tsx:169</span>
+
+    <span class="dim2">&lt;Link href=</span><span class="green">"/hesap"</span><span class="dim2"> className=</span><span class="green">"btn-login"</span><span class="dim2">&gt;</span>
+      <span class="dim2">&lt;span&gt;</span>Sign in<span class="dim2">&lt;/span&gt;</span>
+
+The login button links to <span class="b">/hesap</span>, which does not exist.
+No page file, no rewrite, no middleware match — and the
+production build lists 95 routes with <span class="b">/hesap absent</span>.
+
+Rendered on <span class="b">every page</span>, desktop and mobile. Every visitor
+who tries to sign in gets a 404.
+
+<span class="rule">──────────────────────────────────────────────────</span>
+<span class="b">CLEANUP</span>
+<span class="rule">──────────────────────────────────────────────────</span>
+<span class="dim2">VP-002</span>  Orphan stub module, imported by nothing
+        <span class="blue">src/lib/vocalSeparator.ts</span>  <span class="dim2">266 lines · 7 TODOs</span>
+
+<span class="rule">──────────────────────────────────────────────────</span>
+<span class="b">NOT REPORTED</span> <span class="dim2">— traced, then cleared</span>
+<span class="rule">──────────────────────────────────────────────────</span>
+<span class="dim">vocalSeparator.ts returns empty Blobs and hardcoded quality
+metrics — but it is dead code, and /vokal-ayir is honest: the
+button is disabled and the page says the tool is unavailable.
+Calling it a fake feature would have been a false accusation.</span>
+
+<span class="rule">──────────────────────────────────────────────────</span>
+<span class="b red">✕ DO NOT SHIP</span>       <span class="dim">Your login button goes nowhere.</span>
+<span class="rule">──────────────────────────────────────────────────</span>
+<span class="dim2">routes 95/95 · build passed (7.6s) · not checked: runtime</span>
+</div></div></body></html>
