@@ -1,0 +1,9 @@
+{
+  "id": "false-success-awaited",
+  "family": "false-success",
+  "kind": "control",
+  "pairs_with": "false-success-unawaited",
+  "product_status": "WORKING",
+  "expect_findings": 0,
+  "note": "Awaited and branched on status. Structurally near-identical to the bug fixture."
+}

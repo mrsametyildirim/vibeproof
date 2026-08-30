@@ -1,0 +1,16 @@
+{
+  "id": "dead-ui-noop",
+  "family": "ghost-ui",
+  "kind": "bug",
+  "pairs_with": "dead-ui-honest-disabled",
+  "product_status": "FAKE",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "blocker",
+  "primary_category": "ghost-ui",
+  "related_categories": [
+    "fake-features"
+  ],
+  "broken_hop": "UI -> HANDLER",
+  "expect_findings": 2,
+  "note": "Two dead controls whose severity must differ: Export CSV is a risk, Delete account is a blocker. Same category, different consequence."
+}

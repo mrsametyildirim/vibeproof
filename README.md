@@ -278,6 +278,13 @@ vague about its own gaps.
 Known blind spots, the tripwire's real defects, framework coverage, what it
 deliberately refuses to claim — and the three bugs it found in its own repository.
 
+**[The VibeProof Corpus →](evals/)** — 18 fixtures, 9 matched pairs. Every broken
+example ships with a control that looks almost identical and is correct, because
+"it found the bug" is not a result on its own: a tool that flags everything finds
+it too. No precision or recall numbers are published yet; there are no recorded
+runs to compute them from, and inventing one is exactly what this tool exists to
+catch.
+
 > VibeProof prefers an explicit *"I could not verify this"* over invented certainty.
 
 ---

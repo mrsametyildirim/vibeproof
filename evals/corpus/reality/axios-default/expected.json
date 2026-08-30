@@ -1,0 +1,9 @@
+{
+  "id": "axios-default",
+  "family": "false-success",
+  "kind": "control",
+  "pairs_with": "axios-validate-status-disabled",
+  "product_status": "WORKING",
+  "expect_findings": 0,
+  "note": "No explicit status check, but axios rejects non-2xx by default, so the await throws before the toast. Reporting this is the classic false positive."
+}

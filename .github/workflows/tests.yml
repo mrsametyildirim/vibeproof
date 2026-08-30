@@ -1,4 +1,4 @@
-name: tripwire
+name: tests
 
 # The hook claims POSIX sh portability. Claiming it and testing it are different
 # things — GNU grep accepts regex that BSD grep on macOS does not, and that class
@@ -12,12 +12,14 @@ on:
     paths:
       - 'hooks/**'
       - 'tests/**'
-      - '.github/workflows/tripwire.yml'
+      - 'evals/**'
+      - '.github/workflows/tests.yml'
   pull_request:
     paths:
       - 'hooks/**'
       - 'tests/**'
-      - '.github/workflows/tripwire.yml'
+      - 'evals/**'
+      - '.github/workflows/tests.yml'
   workflow_dispatch:
 
 jobs:
@@ -89,3 +91,10 @@ jobs:
             exit 1
           fi
           echo "no GNU-only escapes"
+
+      # The corpus is only worth anything if every bug keeps its control. A
+      # detector tested solely against broken code passes while flagging
+      # everything; the control is where precision is measured. Losing one to a
+      # rename should turn the build red, not quietly weaken the benchmark.
+      - name: Check the eval corpus
+        run: sh evals/run-check.sh

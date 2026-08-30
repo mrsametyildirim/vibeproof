@@ -1,0 +1,9 @@
+{
+  "id": "fake-persistence-optimistic-rollback",
+  "family": "fake-persistence",
+  "kind": "control",
+  "pairs_with": "fake-persistence-local",
+  "product_status": "WORKING",
+  "expect_findings": 0,
+  "note": "Optimistic update with a real rollback path. The local setState looks identical to the bug fixture at a glance."
+}

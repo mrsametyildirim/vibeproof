@@ -1,0 +1,12 @@
+{
+  "id": "ai-residue-comments",
+  "family": "source-hygiene",
+  "kind": "bug",
+  "pairs_with": "vendor-import-not-residue",
+  "product_status": "MISCONFIGURED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "cleanup",
+  "primary_category": "source-hygiene",
+  "expect_findings": 3,
+  "note": "Comments addressed to a person in a conversation rather than to a future reader. Cleanup severity, never critical."
+}

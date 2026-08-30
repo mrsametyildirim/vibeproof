@@ -1,0 +1,9 @@
+{
+  "id": "dead-ui-honest-disabled",
+  "family": "ghost-ui",
+  "kind": "control",
+  "pairs_with": "dead-ui-noop",
+  "product_status": "WORKING",
+  "expect_findings": 0,
+  "note": "The control does nothing and says so. Disabled plus honest copy is not a broken promise."
+}

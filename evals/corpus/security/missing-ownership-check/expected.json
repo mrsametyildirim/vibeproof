@@ -1,0 +1,13 @@
+{
+  "id": "missing-ownership-check",
+  "family": "authorization",
+  "kind": "bug",
+  "pairs_with": "ownership-enforced-by-rls",
+  "product_status": "EXPOSED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "critical",
+  "primary_category": "authorization",
+  "broken_hop": "IDENTITY -> OWNERSHIP",
+  "requires": "a negative-proof search for middleware, policies and query filters",
+  "note": "Authentication enforced, ownership not. The finding must name the missing predicate, not just say add an authorization check."
+}

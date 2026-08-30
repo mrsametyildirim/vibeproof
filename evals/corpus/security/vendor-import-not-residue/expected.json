@@ -1,0 +1,13 @@
+{
+  "id": "vendor-import-not-residue",
+  "family": "source-hygiene",
+  "kind": "control",
+  "pairs_with": "ai-residue-comments",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "must_not_report": [
+    "source-hygiene",
+    "secrets"
+  ],
+  "note": "Four vendor mentions, all legitimate: a dependency, configuration, a genuine explanation of behaviour, and a model identifier. A name-matching cleanup corrupts this file. The key is server-side and correctly read from env."
+}

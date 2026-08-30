@@ -1,0 +1,13 @@
+{
+  "id": "broken-route-missing",
+  "family": "broken-wiring",
+  "kind": "bug",
+  "pairs_with": "broken-route-rewrite",
+  "product_status": "BROKEN",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "blocker",
+  "primary_category": "broken-wiring",
+  "broken_hop": "LINK -> DESTINATION",
+  "requires": "a stated negative-proof scope covering routes, groups, dynamic segments and rewrites",
+  "note": "Nothing resolves /checkout. Reporting it without the negative proof is the right answer reached the wrong way."
+}

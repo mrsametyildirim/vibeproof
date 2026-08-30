@@ -1,0 +1,12 @@
+{
+  "id": "secret-service-role-public-env",
+  "family": "secrets",
+  "kind": "bug",
+  "pairs_with": "secret-anon-key-client",
+  "product_status": "EXPOSED",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "critical",
+  "primary_category": "secrets",
+  "requires": "knowing NEXT_PUBLIC_ is inlined into the client bundle",
+  "note": "The service_role key bypasses row-level security and is behind a public prefix, so it ships to the browser."
+}

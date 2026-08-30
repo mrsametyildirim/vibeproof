@@ -1,0 +1,15 @@
+{
+  "id": "eventual-consistency-overclaimed",
+  "family": "promise-drift",
+  "kind": "bug",
+  "pairs_with": "eventual-consistency-honest",
+  "product_status": "FAKE",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "blocker",
+  "primary_category": "false-success",
+  "broken_hop": "SUCCESS DECISION -> UI FEEDBACK",
+  "must_not_report": [
+    "fake-persistence"
+  ],
+  "note": "The endpoint enqueues a request; the copy claims completion. The defect is the wording, not the queue. Identical backend to the control."
+}

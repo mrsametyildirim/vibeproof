@@ -1,0 +1,12 @@
+{
+  "id": "broken-route-rewrite",
+  "family": "broken-wiring",
+  "kind": "control",
+  "pairs_with": "broken-route-missing",
+  "product_status": "WORKING",
+  "expect_findings": 0,
+  "must_not_report": [
+    "broken-wiring"
+  ],
+  "note": "No app/checkout directory exists, so a filename-only search declares it missing. A rewrite resolves it. This fixture catches lazy negative proof."
+}

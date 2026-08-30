@@ -1,0 +1,12 @@
+{
+  "id": "ownership-enforced-by-rls",
+  "family": "authorization",
+  "kind": "control",
+  "pairs_with": "missing-ownership-check",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "must_not_report": [
+    "authorization"
+  ],
+  "note": "No ownership predicate in application code, and that is correct: the row policy enforces it. Missing the migration produces a confident false CRITICAL — the most damaging error this mode can make."
+}

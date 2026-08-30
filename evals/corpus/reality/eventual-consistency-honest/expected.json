@@ -1,0 +1,9 @@
+{
+  "id": "eventual-consistency-honest",
+  "family": "promise-drift",
+  "kind": "control",
+  "pairs_with": "eventual-consistency-overclaimed",
+  "product_status": "WORKING",
+  "expect_findings": 0,
+  "note": "Only enqueues, and the copy says scheduled. Queued work is not fake persistence when the promise matches the guaranteed stage."
+}

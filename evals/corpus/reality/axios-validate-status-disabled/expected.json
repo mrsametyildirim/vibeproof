@@ -1,0 +1,13 @@
+{
+  "id": "axios-validate-status-disabled",
+  "family": "false-success",
+  "kind": "bug",
+  "pairs_with": "axios-default",
+  "product_status": "FAKE",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "risk",
+  "primary_category": "false-success",
+  "broken_hop": "RESULT -> SUCCESS DECISION",
+  "requires": "reading the client factory, not the call site",
+  "note": "validateStatus: () => true makes every response resolve, so the await never throws. The suppression that is correct for axios-default is wrong here."
+}

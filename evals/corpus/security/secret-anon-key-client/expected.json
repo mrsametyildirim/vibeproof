@@ -1,0 +1,9 @@
+{
+  "id": "secret-anon-key-client",
+  "family": "secrets",
+  "kind": "control",
+  "pairs_with": "secret-service-role-public-env",
+  "product_status": "SECURED",
+  "expect_findings": 0,
+  "note": "The anon key is designed to be public; row policies are the control. Flagging it is noise that costs the report its credibility."
+}

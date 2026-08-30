@@ -1,0 +1,16 @@
+{
+  "id": "false-success-unawaited",
+  "family": "false-success",
+  "kind": "bug",
+  "pairs_with": "false-success-awaited",
+  "product_status": "FAKE",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "risk",
+  "primary_category": "false-success",
+  "broken_hop": "RESULT -> SUCCESS DECISION",
+  "must_not_report": [
+    "ghost-ui",
+    "fake-persistence"
+  ],
+  "note": "updateProfile is async and never awaited; the toast fires regardless of outcome."
+}

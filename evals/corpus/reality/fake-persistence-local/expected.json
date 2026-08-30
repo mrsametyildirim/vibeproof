@@ -1,0 +1,15 @@
+{
+  "id": "fake-persistence-local",
+  "family": "fake-persistence",
+  "kind": "bug",
+  "pairs_with": "fake-persistence-optimistic-rollback",
+  "product_status": "FAKE",
+  "evidence_max": "STATIC_VERIFIED",
+  "severity": "blocker",
+  "primary_category": "fake-persistence",
+  "broken_hop": "PERSISTENCE -> RELOAD",
+  "must_not_report": [
+    "false-success"
+  ],
+  "note": "Deletion only filters an array; the note returns on refresh. One root cause, so it must not also score as false-success for the toast."
+}
